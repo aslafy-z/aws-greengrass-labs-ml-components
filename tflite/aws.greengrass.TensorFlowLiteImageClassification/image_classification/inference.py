@@ -56,10 +56,6 @@ def set_configuration(config):
     if new_config["use_camera"].lower() == "true":
         prediction_utils.enable_camera()
 
-    new_config["image"] = prediction_utils.load_image(
-        path.join(new_config["image_dir"], new_config["image_name"])
-    )
-
     # Run inference with the updated config indicating the config change.
     run_inference(new_config, True)
 
@@ -80,7 +76,10 @@ def run_inference(new_config, config_changed):
     if new_config["use_camera"].lower() == "true":
         prediction_utils.predict_from_cam()
     else:
-        prediction_utils.predict_from_image(new_config["image"])
+        image = prediction_utils.load_image(
+            path.join(new_config["image_dir"], new_config["image_name"])
+        )
+        prediction_utils.predict_from_image(image)
     config_utils.SCHEDULED_THREAD = threading.Timer(
         int(new_config["prediction_interval_secs"]), run_inference, [new_config, config_changed]
     )
